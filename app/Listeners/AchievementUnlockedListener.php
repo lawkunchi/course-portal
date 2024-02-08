@@ -9,22 +9,43 @@ class AchievementUnlockedListener
 {
 
     /**
-     * Handle user login events.
+     * Handle CommentWritten Event
      */
     public function onCommentWritten($event)
     {
         $user = User::findOrFail($event->comment->user_id);
 
-        $totalAchievements = count($user->watched) + count($user->comments);
         $badges = getBadges();
-        if (isset($badges[$totalAchievements])) {
+        list($lessonsAchieved) = handleAchievements(
+            getLessonAchievements(),
+            count($user->watched)
+        );
+        list($commentAchieved) = handleAchievements(
+            getCommentAchievements(),
+            count($user->comments)
+        );
+
+        $achievementArray = [...$commentAchieved, ...$lessonsAchieved];
+        $totalAchievements = count($achievementArray);
+        // Get the current and next badge
+        $badge = null;
+        foreach ($badges as $key => $value) {
+            if ($totalAchievements >= $key) {
+                $badge = $value;
+            }
+        }
+
+        if ($badge) {
             BadgeUnclocked::dispatch([
-                'badge_name' => $badges[$totalAchievements],
+                'badge_name' => $badge,
                 'user' => $user,
             ]);
         }
     }
 
+    /**
+     * Handle LessonWatched Event
+     */
     public function onLessonWatched($event)
     {
         $totalAchievements = count($event->user->watched) + count($event->user->comments);

@@ -12,9 +12,8 @@ use App\Models\User;
 class CommentWrittenTest extends TestCase
 {
     /**
-     * A basic test example.
+     * Test that the CommentWritten event is not dispatched before the comment is created
      */
-
 
     public function test_dispatches_an_event_when_a_comment_is_written(): void
     {
@@ -32,6 +31,10 @@ class CommentWrittenTest extends TestCase
         });
     }
 
+
+     /**
+     * Test that the CommentWrittenAchievement listener is listening to the CommentWritten event
+     */
     public function test_event_listener_when_a_comment_is_written(): void
     {
         Event::fake([CommentWritten::class]);

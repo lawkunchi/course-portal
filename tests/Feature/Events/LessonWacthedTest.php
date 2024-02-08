@@ -12,7 +12,7 @@ use App\Models\User;
 class LessonWacthedTest extends TestCase
 {
     /**
-     * A basic test example.
+     * Test that the LessonWatched event is dispatched with the correct lesson and user
      */
 
     public function test_dispatches_an_event_when_a_lesson_is_watched(): void
@@ -32,6 +32,9 @@ class LessonWacthedTest extends TestCase
         });
     }
 
+     /**
+     *  Test that the LessonWatchedAchievement listener is listening to the LessonWatched event
+     */
     public function test_event_listener_when_a_lesson_is_watched(): void
     {
         Event::fake([LessonWatched::class]);
