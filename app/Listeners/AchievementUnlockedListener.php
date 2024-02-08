@@ -8,13 +8,9 @@ use App\Models\User;
 class AchievementUnlockedListener
 {
 
-    /**
-     * Handle CommentWritten Event
-     */
-    public function onCommentWritten($event)
-    {
-        $user = User::findOrFail($event->comment->user_id);
 
+    public function checkBadge($user)
+    {
         $badges = getBadges();
         list($lessonsAchieved) = handleAchievements(
             getLessonAchievements(),
@@ -42,20 +38,21 @@ class AchievementUnlockedListener
             ]);
         }
     }
+    /**
+     * Handle CommentWritten Event
+     */
+    public function onCommentWritten($event)
+    {
+        $user = User::findOrFail($event->comment->user_id);
+        self::checkBadge($user);
+    }
 
     /**
      * Handle LessonWatched Event
      */
     public function onLessonWatched($event)
     {
-        $totalAchievements = count($event->user->watched) + count($event->user->comments);
-        $badges = getBadges();
-        if (isset($badges[$totalAchievements])) {
-            BadgeUnclocked::dispatch([
-                'badge_name' => $badges[$totalAchievements],
-                'user' => $event->user,
-            ]);
-        }
+        self::checkBadge($event->user);
     }
 
 
